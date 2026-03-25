@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const FEATURES = [
-  { icon: "⬛", title: "Kanban Boards",      desc: "Visualize work with drag-and-drop columns. Move tasks from To-Do to Done effortlessly." },
-  { icon: "👥", title: "Team Rooms",          desc: "Create private project rooms, invite teammates via link, and collaborate in real time." },
-  { icon: "📊", title: "Progress Tracking",   desc: "Watch task progress bars fill up. Auto-escalate to Review when 100% complete." },
-  { icon: "🔍", title: "Code Review",         desc: "Built-in review workflow. Approve or reject — tasks bounce back for fixes automatically." },
-  { icon: "🔔", title: "Activity Feed",       desc: "Full audit trail on every task. Know who did what and when across your project." },
-  { icon: "⚡", title: "Priority Levels",     desc: "Tag tasks as Low, Medium, High, or Urgent. Never lose sight of what matters most." },
+  { icon: "⬛", title: "Kanban Boards", desc: "Visualize work with drag-and-drop columns. Move tasks from To-Do to Done effortlessly." },
+  { icon: "👥", title: "Team Rooms", desc: "Create private project rooms, invite teammates via link, and collaborate in real time." },
+  { icon: "📊", title: "Progress Tracking", desc: "Watch task progress bars fill up. Auto-escalate to Review when 100% complete." },
+  { icon: "🔍", title: "Code Review",  desc: "Built-in review workflow. Approve or reject — tasks bounce back for fixes automatically." },
+  { icon: "🔔", title: "Activity Feed", desc: "Full audit trail on every task. Know who did what and when across your project." },
+  { icon: "⚡", title: "Priority Levels", desc: "Tag tasks as Low, Medium, High, or Urgent. Never lose sight of what matters most." },
 ];
 
 const TICKER_ITEMS = ["Kanban", "Sprints", "Code Review", "Team Rooms", "Task Tracking", "Priority Management", "Activity Logs", "Invite Links"];
@@ -158,7 +158,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="landing-footer">
         <span className="brand-logo">◆</span>
-        <span style={{ color: "var(--text-muted)", fontSize: 13 }}>© 2025 Jiva. Built for teams who ship.</span>
+        <span style={{ color: "var(--text-muted)", fontSize: 13 }}>© 2026 Jiva. Built by CodeUp Team.</span>
       </footer>
     </div>
   );
