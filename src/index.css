@@ -1,8 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
-
-/* ════════════════════════════════════════════
-   DESIGN TOKENS
-════════════════════════════════════════════ */
 :root {
   --bg-primary: #0a0c10;
   --bg-secondary: #111318;
@@ -544,10 +540,6 @@ input, textarea, select { font-family: var(--font-body); outline: none; }
 
 .accept-btn         { font-size: 11px; font-weight: 600; padding: 3px 10px; background: var(--accent-light); color: var(--accent); border: 1px solid rgba(79,110,247,0.3); border-radius: 99px; transition: all 0.15s; }
 .accept-btn:hover   { background: var(--accent); color: #fff; }
-
-/* ════════════════════════════════════════════
-   TASK MODAL
-════════════════════════════════════════════ */
 .task-modal         { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
 
 .task-modal-header  { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-card); z-index: 10; }
