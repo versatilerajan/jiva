@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { addTeamMember, getTeams } from "../services/api";
+import { getTeams } from "../services/api";
+import axios from "axios";
+import { auth } from "../firebase";
 
 export default function JoinRoom() {
   const { teamId }                = useParams();
@@ -9,38 +11,66 @@ export default function JoinRoom() {
   const navigate                  = useNavigate();
   const [status, setStatus]       = useState("loading");
   const [teamName, setTeamName]   = useState("");
+  const hasRun                    = useRef(false); // prevent double-run in StrictMode
+
+  // Call backend directly with the current Firebase token
+  // This bypasses the role check — anyone can join via invite link
+  const joinTeamDirect = useCallback(async () => {
+    const token = await auth.currentUser.getIdToken();
+    const base  = import.meta.env.VITE_API_URL || "https://jivabackend.vercel.app";
+    const res   = await axios.post(
+      `${base}/api/teams/${teamId}/join`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return res.data;
+  }, [teamId]);
 
   const joinTeam = useCallback(async () => {
-    if (!dbUser) return;
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     setStatus("joining");
     try {
-      const res  = await getTeams();
-      const team = (res.data.teams || []).find(t => t._id === teamId);
+      // First fetch team info to show the name
+      const token = await auth.currentUser.getIdToken();
+      const base  = import.meta.env.VITE_API_URL || "https://jivabackend.vercel.app";
+      const teamRes = await axios.get(
+        `${base}/api/teams/${teamId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const team = teamRes.data.team;
       if (!team) { setStatus("error"); return; }
       setTeamName(team.team_name);
-      const alreadyMember = team.members?.some(m => m._id === dbUser._id);
-      if (alreadyMember) { setStatus("already"); return; }
-      await addTeamMember(teamId, dbUser._id);
+
+      // Join the team
+      await joinTeamDirect();
       setStatus("joined");
     } catch (e) {
-      console.error(e);
-      setStatus("error");
+      console.error("Join error:", e.response?.data || e.message);
+      // If already a member, treat as success
+      if (e.response?.data?.message?.toLowerCase().includes("already")) {
+        setStatus("already");
+      } else {
+        setStatus("error");
+      }
     }
-  }, [dbUser, teamId]);
+  }, [teamId, joinTeamDirect]);
 
   useEffect(() => {
     if (loading) return;
+
     if (!user) {
       sessionStorage.setItem("pendingJoin", `/join/${teamId}`);
       navigate("/auth");
       return;
     }
-    // Avoid calling async function directly in effect
-    const runJoinTeam = async () => {
-      await joinTeam();
-    };
-    runJoinTeam();
-  }, [loading, user, teamId, navigate, joinTeam]);
+
+    // Wait until dbUser is synced with backend
+    if (!dbUser) return;
+
+    joinTeam();
+  }, [loading, user, dbUser, teamId, navigate, joinTeam]);
 
   const messages = {
     loading: { icon: "⏳", title: "Checking invite…",        sub: "Hold on a moment." },
@@ -60,12 +90,14 @@ export default function JoinRoom() {
         <p style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 28, lineHeight: 1.6 }}>{msg.sub}</p>
 
         {(status === "joined" || status === "already") && (
-          <button className="btn btn-primary" style={{ width: "100%", justifyContent: "center", padding: 12 }} onClick={() => navigate(`/board/${teamId}`)}>
+          <button className="btn btn-primary" style={{ width: "100%", justifyContent: "center", padding: 12 }}
+            onClick={() => navigate(`/board/${teamId}`)}>
             Go to board →
           </button>
         )}
         {status === "error" && (
-          <button className="btn btn-ghost" style={{ width: "100%", justifyContent: "center" }} onClick={() => navigate("/rooms")}>
+          <button className="btn btn-ghost" style={{ width: "100%", justifyContent: "center" }}
+            onClick={() => navigate("/rooms")}>
             Back to rooms
           </button>
         )}
